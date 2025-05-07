@@ -25,7 +25,7 @@ axiosInstance.interceptors.response.use(
         return axiosInstance(originalRequest);
       } catch (refreshError) {
         console.error("🔒 Token refresh failed:", refreshError);
-        // Optional: Redirect to login page or dispatch logout action
+
         useNavigate("/auth");
         return Promise.reject(refreshError);
       }
