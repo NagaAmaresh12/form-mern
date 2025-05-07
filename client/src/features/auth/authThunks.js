@@ -68,6 +68,7 @@ export const logoutUser = createAsyncThunk(
     } catch (err) {
       const message =
         err.response?.data?.message || err.response?.data?.error || err.message;
+      console.log("error in logout", message);
       return thunkAPI.rejectWithValue(message);
     }
   }
@@ -83,6 +84,8 @@ export const updateAvatarSeed = createAsyncThunk(
     } catch (err) {
       const message =
         err.response?.data?.message || err.response?.data?.error || err.message;
+      console.log("error in avatarseed", message);
+
       return thunkAPI.rejectWithValue(message);
     }
   }
