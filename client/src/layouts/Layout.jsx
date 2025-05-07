@@ -5,21 +5,23 @@ import SideBar from "../components/SideBar.jsx";
 
 const Layout = () => {
   return (
-    <div className="grid grid-rows-[auto_1fr] grid-cols-[250px_1fr] min-h-screen">
+    <div className="relative min-h-screen">
       {/* Navbar spans full width of top row */}
-      <div className="row-start-1 row-end-2 col-start-1 col-end-3">
+      <div className="w-full h-24 ">
         <Navbar />
       </div>
 
-      {/* Sidebar on left */}
-      <div className="row-start-1 row-end-3 col-start-1 col-end-2 border-r pt-28 text-white px-4 ">
-        <SideBar />
-      </div>
+      <div className="relative flex items-start h-[84vh] w-full">
+        {/* Sidebar on left */}
+        <div className=" border-r pt-8 h-full w-64 text-white px-4 ">
+          <SideBar />
+        </div>
 
-      {/* Main content on right */}
-      <main className="row-start-2 row-end-3 col-start-2 col-end-3 py-32 ">
-        <Outlet />
-      </main>
+        {/* Main content on right */}
+        <main className="relative h-full w-full bg-[#EFEFEF] relative">
+          <Outlet />
+        </main>
+      </div>
     </div>
   );
 };

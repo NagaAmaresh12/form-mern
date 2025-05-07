@@ -8,6 +8,7 @@ import { MdOutlineCreateNewFolder } from "react-icons/md";
 const ProjectsList = () => {
   const dispatch = useDispatch();
   const { projects, status, error } = useSelector((state) => state.projects);
+  const { role } = useSelector((state) => state.auth.user);
 
   useEffect(() => {
     dispatch(fetchAllProjects())
@@ -30,14 +31,16 @@ const ProjectsList = () => {
   if (status === "error") return <h1>{error || "Failed to load projects"}</h1>;
 
   return (
-    <div className="relative h-screen w-full">
-      <div className="h-4 w-full flex justify-end items-center px-5  ">
-        <Button variant={"outline"} asChild className={" text-md  "}>
-          <Link to={"/projects/new"}>
-            Create New <MdOutlineCreateNewFolder />
-          </Link>
-        </Button>
-      </div>
+    <div className="relative flex flex-col mt-4 items-start  w-full overflow-hidden ">
+      {role === "admin" && (
+        <div className="h-12 w-full flex justify-end items-center px-5  ">
+          <Button variant={"outline"} asChild className={" text-md  bg-white "}>
+            <Link to={"/projects/new"}>
+              Create New <MdOutlineCreateNewFolder />
+            </Link>
+          </Button>
+        </div>
+      )}
       <div className=" w-full flex flex-wrap ">
         {console.log("state is", projects)}
         {Array.isArray(projects) && projects.length > 0 ? (
