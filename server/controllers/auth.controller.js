@@ -27,13 +27,13 @@ export const signUpUser = async (req, res) => {
       .status(201)
       .cookie("refreshToken", refreshToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        secure: true,
         sameSite: "strict",
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
       })
       .cookie("accessToken", accessToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        secure: true,
         sameSite: "strict",
         maxAge: 1 * 60 * 60 * 1000, // 7 days
       })
@@ -79,13 +79,13 @@ export const signInUser = async (req, res) => {
     res
       .cookie("refreshToken", refreshToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        secure: true,
         sameSite: "strict",
         maxAge: 7 * 24 * 60 * 60 * 1000,
       })
       .cookie("accessToken", accessToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        secure: true,
         sameSite: "strict",
         maxAge: 1 * 60 * 60 * 1000, // 7 days
       })
@@ -117,12 +117,12 @@ export const logoutUser = async (req, res) => {
     res
       .clearCookie("refreshToken", {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        secure: true,
         sameSite: "strict",
       })
       .clearCookie("accessToken", {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        secure: true,
         sameSite: "strict",
       })
       .json({ success: true, message: "Logout successful" });
@@ -154,13 +154,13 @@ export const refreshToken = async (req, res) => {
     res
       .cookie("refreshToken", newRefreshToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        secure: true,
         sameSite: "strict",
         maxAge: 7 * 24 * 60 * 60 * 1000,
       })
       .cookie("accessToken", newAccessToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        secure: true,
         sameSite: "strict",
         maxAge: 1 * 60 * 60 * 1000, // 7 days
       })
