@@ -1,4 +1,3 @@
-// src/features/auth/authSlice.js
 import { createSlice } from "@reduxjs/toolkit";
 import {
   signInUser,
@@ -44,7 +43,7 @@ const authSlice = createSlice({
         state.loading = false;
         state.status = "failed";
         state.isAuthenticated = false;
-        state.user = state.initialState.user;
+        state.user = { ...initialState.user };
         state.error = action.payload || action.error.message;
       })
 
@@ -55,8 +54,6 @@ const authSlice = createSlice({
         state.error = null;
       })
       .addCase(checkAuth.fulfilled, (state, action) => {
-        console.log("checkauth action payload", action.payload);
-
         state.loading = false;
         state.status = "succeeded";
         state.user = action.payload.user;
@@ -67,7 +64,7 @@ const authSlice = createSlice({
         state.loading = false;
         state.status = "unauthenticated";
         state.isAuthenticated = false;
-        state.user = initialState.user;
+        state.user = { ...initialState.user };
         state.error = action.payload || action.error.message;
       })
 
@@ -80,15 +77,15 @@ const authSlice = createSlice({
         state.status = "idle";
         state.loading = false;
         state.isAuthenticated = false;
-        state.user = initialState.user;
+        state.user = { ...initialState.user };
         state.error = null;
       })
       .addCase(logoutUser.rejected, (state, action) => {
         state.loading = false;
         state.status = "failed";
+        // Keep user state intact if logout fails
         state.error = action.payload || action.error.message;
       })
-      //handle avatar
       // Handle avatar seed update
       .addCase(updateAvatarSeed.pending, (state) => {
         state.status = "updating_avatar";
@@ -96,8 +93,6 @@ const authSlice = createSlice({
         state.error = null;
       })
       .addCase(updateAvatarSeed.fulfilled, (state, action) => {
-        console.log("avatar", action.payload.avatarSeed.avatarSeed);
-
         state.loading = false;
         state.status = "avatar_updated";
         state.user.avatarSeed = action.payload.avatarSeed.avatarSeed;
