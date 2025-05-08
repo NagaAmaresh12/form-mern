@@ -104,6 +104,7 @@ export const createProject = async (req, res) => {
 export const editProject = async (req, res) => {
   const id = req.params.id;
   const data = req.body;
+  console.log("data editProject", data);
 
   // Validate ID format
   if (!id || !id.match(/^[0-9a-fA-F]{24}$/)) {

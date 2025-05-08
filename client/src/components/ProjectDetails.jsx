@@ -1,79 +1,104 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+// src/features/projects/ProjectDetails.jsx
+import React, { useEffect, useState, useCallback } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
   fetchProject,
   editProject,
   deleteProject,
 } from "@/features/projects/projectThunk";
-import ProjectForm from "./ProjectForm";
+import { useForm, useFieldArray } from "react-hook-form";
 import { toast } from "react-toastify";
+import ProjectForm from "./ProjectForm.jsx";
 
 const ProjectDetails = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { projects } = useSelector((state) => state.projects);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
+
+  const {
+    register,
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {},
+  });
+
+  const {
+    fields: teamFields,
+    append: appendTeam,
+    remove: removeTeam,
+  } = useFieldArray({ control, name: "projectTeamDetails" });
+  const {
+    fields: activityFields,
+    append: appendActivity,
+    remove: removeActivity,
+  } = useFieldArray({ control, name: "projectActivities" });
 
   useEffect(() => {
-    const fetchData = async () => {
+    if (!id) return;
+    dispatch(fetchProject(id))
+      .unwrap()
+      .then((res) => {
+        // make a mutable clone of the fetched data
+        const data = JSON.parse(JSON.stringify(res.data));
+        // normalize date
+        if (data.projectCommencementDate) {
+          data.projectCommencementDate = new Date(data.projectCommencementDate)
+            .toISOString()
+            .split("T")[0];
+        }
+        reset(data);
+      })
+      .catch((err) => toast.error(err.message || "Failed to fetch project"))
+      .finally(() => setLoading(false));
+  }, [dispatch, id, reset]);
+
+  const handleUpdate = useCallback(
+    async (formData) => {
       try {
-        const response = await dispatch(fetchProject(id)).unwrap();
-        console.log("projectdetails response", response);
-      } catch (error) {
-        toast.error(error.message || "Failed to fetch project");
-      } finally {
-        setLoading(false);
+        const result = await dispatch(editProject({ id, formData })).unwrap();
+        if (result.success) toast.success("Project updated successfully!");
+      } catch (err) {
+        toast.error(err.message || "Failed to update project");
       }
-    };
-    console.log("id", id);
+    },
+    [dispatch, id]
+  );
 
-    if (id) {
-      fetchData();
-    }
-  }, [dispatch, id]);
-  const deleteProjectHandler = async (projectId) => {
+  const handleDelete = useCallback(async () => {
     try {
-      const data = await dispatch(deleteProject(projectId)).unwrap();
-      console.log("response in projectdetails", data);
-
-      if (data.success === true) {
+      const result = await dispatch(deleteProject(id)).unwrap();
+      if (result.success) {
         toast.success("Deleted Project");
         navigate("/projects");
       }
-    } catch (error) {
-      toast.error(error.message || "Failed to delete project");
+    } catch (err) {
+      toast.error(err.message || "Failed to delete project");
     }
-  };
+  }, [dispatch, id, navigate]);
 
-  const handleUpdate = async (formData) => {
-    try {
-      const data = await dispatch(editProject({ id, formData })).unwrap();
-      if (data.success === true) {
-        toast.success("Project updated successfully!");
-        console.log("updated data projectdetails", data);
-      }
-    } catch (error) {
-      toast.error(error.message || "Failed to update project");
-    }
-  };
-
-  if (loading) {
-    return <div>Loading project details...</div>;
-  }
-
-  if (!projects) {
-    return <div>Project not found.</div>;
-  }
+  if (loading) return <div>Loading...</div>;
+  if (!projects) return <div>Project not found.</div>;
 
   return (
     <ProjectForm
-      defaultValues={projects}
-      onSubmit={handleUpdate}
-      buttonLabel="Update Project"
-      deleteProjectHandler={deleteProjectHandler}
+      onSubmit={handleSubmit(handleUpdate)}
+      register={register}
+      control={control}
+      errors={errors}
+      teamFields={teamFields}
+      appendTeam={appendTeam}
+      removeTeam={removeTeam}
+      activityFields={activityFields}
+      appendActivity={appendActivity}
+      removeActivity={removeActivity}
       projectId={id}
+      deleteProjectHandler={handleDelete}
     />
   );
 };

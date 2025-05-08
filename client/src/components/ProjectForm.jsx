@@ -1,290 +1,197 @@
+// src/features/projects/components/ProjectForm.jsx
+import React from "react";
+import { useSelector } from "react-redux";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import React, { useEffect } from "react";
-import { useForm, useFieldArray } from "react-hook-form";
-import { useSelector } from "react-redux";
 
 const ProjectForm = ({
   onSubmit,
-  defaultValues = {},
-  deleteProjectHandler,
+  register,
+  errors,
+  teamFields,
+  appendTeam,
+  removeTeam,
+  activityFields,
+  appendActivity,
+  removeActivity,
   projectId,
+  deleteProjectHandler,
 }) => {
   const role = useSelector((state) => state.auth.user.role);
   const isDisabled = role !== "admin";
 
-  const {
-    register,
-    handleSubmit,
-    control,
-    reset,
-    formState: { errors },
-  } = useForm({
-    defaultValues: {
-      projectTitle: "",
-      projectSanctionedBy: "",
-      projectInspectingAuthority: "",
-      projectLocation: "",
-      projectBudget: "",
-      projectObjectives: "",
-      projectDuration: "",
-      projectCommencementDate: "",
-      projectRangeCoverage: {
-        numberOfVillages: "",
-        totalPopulation: "",
-        numberOfFarmers: "",
-      },
-      requiredSupportFromHO: "",
-      pendingWorks: "",
-      projectTeamDetails: [{ name: "", contactNumber: "", headQtrs: "" }],
-      projectActivities: [
-        {
-          name: "",
-          daywiseWorkProgress: "",
-          placeOfVisit: "",
-          actionTaken: "",
-          actionImpact: "",
-          programAttendance: "",
-          observations: "",
-        },
-      ],
-      ...defaultValues,
-    },
-  });
-
-  const {
-    fields: teamFields,
-    append: appendTeam,
-    remove: removeTeam,
-  } = useFieldArray({
-    control,
-    name: "projectTeamDetails",
-  });
-
-  const {
-    fields: activityFields,
-    append: appendActivity,
-    remove: removeActivity,
-  } = useFieldArray({
-    control,
-    name: "projectActivities",
-  });
-
-  useEffect(() => {
-    if (defaultValues && typeof defaultValues === "object") {
-      const data = { ...defaultValues };
-
-      if (data.projectCommencementDate) {
-        const date = new Date(data.projectCommencementDate);
-        if (!isNaN(date)) {
-          data.projectCommencementDate = date.toISOString().split("T")[0];
-        } else {
-          data.projectCommencementDate = "";
-        }
-      }
-
-      reset(data);
-    }
-  }, [defaultValues, reset]);
-
   return (
     <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="p-6 space-y-6 bg-white rounded-md shadow-md border-[1px] border-zinc-900 m-4"
+      onSubmit={onSubmit}
+      className="p-6 space-y-6 bg-white rounded-md shadow-md border border-zinc-900 m-4"
     >
       <h2 className="text-2xl font-semibold">Project Details</h2>
 
-      {/* Basic Project Fields */}
-      <div className="space-y-2">
-        <Input
-          {...register("projectTitle", { required: "Title is required" })}
-          placeholder="Project Title"
-          className="Input"
-          disabled={isDisabled}
-        />
-        <p className="text-red-500">{errors.projectTitle?.message}</p>
-
-        <Input
-          {...register("projectSanctionedBy", { required: "Required" })}
-          placeholder="Sanctioned By"
-          className="Input"
-          disabled={isDisabled}
-        />
-        <Input
-          {...register("projectInspectingAuthority", { required: "Required" })}
-          placeholder="Inspecting Authority"
-          className="Input"
-          disabled={isDisabled}
-        />
-        <Input
-          {...register("projectLocation", { required: "Required" })}
-          placeholder="Location"
-          className="Input"
-          disabled={isDisabled}
-        />
-        <Input
-          type="number"
-          {...register("projectBudget", { required: "Required" })}
-          placeholder="Budget"
-          className="Input"
-          disabled={isDisabled}
-        />
-      </div>
+      {/* Basic Fields */}
+      <Input
+        {...register("projectTitle", { required: "Required" })}
+        placeholder="Title"
+        disabled={isDisabled}
+      />
+      {errors.projectTitle && (
+        <p className="text-red-500">{errors.projectTitle.message}</p>
+      )}
+      <Input
+        {...register("projectSanctionedBy", { required: true })}
+        placeholder="Sanctioned By"
+        disabled={isDisabled}
+      />
+      <Input
+        {...register("projectInspectingAuthority", { required: true })}
+        placeholder="Inspecting Authority"
+        disabled={isDisabled}
+      />
+      <Input
+        {...register("projectLocation", { required: true })}
+        placeholder="Location"
+        disabled={isDisabled}
+      />
+      <Input
+        type="number"
+        {...register("projectBudget", { required: true })}
+        placeholder="Budget"
+        disabled={isDisabled}
+      />
 
       {/* Team Members */}
       <div className="space-y-4">
         <h3 className="text-xl font-medium">Team Members</h3>
-        {teamFields.map((item, index) => (
-          <div key={item.id} className="space-y-2 border p-3 rounded-md">
+        {teamFields.map((fld, i) => (
+          <div key={fld.id} className="space-y-2 border p-3 rounded-md">
             <Input
-              {...register(`projectTeamDetails.${index}.name`, {
-                required: "Required",
-              })}
+              {...register(`projectTeamDetails.${i}.name`, { required: true })}
               placeholder="Name"
-              className="Input"
               disabled={isDisabled}
             />
             <Input
-              {...register(`projectTeamDetails.${index}.contactNumber`, {
-                required: "Required",
+              {...register(`projectTeamDetails.${i}.contactNumber`, {
+                required: true,
               })}
-              placeholder="Contact Number"
-              className="Input"
+              placeholder="Contact No."
               disabled={isDisabled}
             />
             <Input
-              {...register(`projectTeamDetails.${index}.headQtrs`, {
-                required: "Required",
+              {...register(`projectTeamDetails.${i}.headQtrs`, {
+                required: true,
               })}
-              placeholder="Headquarters"
-              className="Input"
+              placeholder="HQ"
               disabled={isDisabled}
             />
             {!isDisabled && (
               <Button
                 type="button"
-                variant="destructive"
-                onClick={() => removeTeam(index)}
-                className="mt-2 bg-zinc-900 text-white"
+                variant="outline"
+                onClick={() => removeTeam(i)}
               >
-                Remove Member
+                Remove
               </Button>
             )}
           </div>
         ))}
         {!isDisabled && (
-          <button
+          <Button
             type="button"
+            variant={"outline"}
             onClick={() =>
               appendTeam({ name: "", contactNumber: "", headQtrs: "" })
             }
-            className="btn"
           >
-            + Add Team Member
-          </button>
+            + Add
+          </Button>
         )}
       </div>
 
-      {/* Project Objectives, Duration, Date */}
+      {/* Objectives, Duration, Date */}
       <Textarea
-        {...register("projectObjectives", { required: "Required" })}
-        placeholder="Project Objectives"
-        className="Input"
+        {...register("projectObjectives", { required: true })}
+        placeholder="Objectives"
         disabled={isDisabled}
       />
       <Input
-        {...register("projectDuration", { required: "Required" })}
+        {...register("projectDuration", { required: true })}
         placeholder="Duration"
-        className="Input"
         disabled={isDisabled}
       />
       <Input
         type="date"
-        {...register("projectCommencementDate", { required: "Required" })}
-        placeholder="Commencement Date"
-        className="Input"
+        {...register("projectCommencementDate", { required: true })}
         disabled={isDisabled}
       />
 
-      {/* Project Activities */}
+      {/* Activities */}
       <div className="space-y-4">
-        <h3 className="text-xl font-medium">Project Activities</h3>
-        {activityFields.map((item, index) => (
-          <div
-            key={item.id}
-            className="space-y-2 border p-3 rounded-md relative"
-          >
+        <h3 className="text-xl font-medium">Activities</h3>
+        {activityFields.map((fld, i) => (
+          <div key={fld.id} className="space-y-2 border p-3 rounded-md">
             <Input
-              {...register(`projectActivities.${index}.name`, {
-                required: "Required",
-              })}
-              placeholder="Activity Name"
-              className="Input"
+              {...register(`projectActivities.${i}.name`, { required: true })}
+              placeholder="Name"
               disabled={isDisabled}
             />
             <Input
-              {...register(`projectActivities.${index}.daywiseWorkProgress`, {
-                required: "Required",
+              {...register(`projectActivities.${i}.daywiseWorkProgress`, {
+                required: true,
               })}
-              placeholder="Work Progress"
-              className="Input"
+              placeholder="Progress"
               disabled={isDisabled}
             />
             <Input
-              {...register(`projectActivities.${index}.placeOfVisit`, {
-                required: "Required",
+              {...register(`projectActivities.${i}.placeOfVisit`, {
+                required: true,
               })}
               placeholder="Place of Visit"
-              className="Input"
               disabled={isDisabled}
             />
             <Input
-              {...register(`projectActivities.${index}.actionTaken`, {
-                required: "Required",
+              {...register(`projectActivities.${i}.actionTaken`, {
+                required: true,
               })}
               placeholder="Action Taken"
-              className="Input"
               disabled={isDisabled}
             />
             <Input
-              {...register(`projectActivities.${index}.actionImpact`, {
-                required: "Required",
+              {...register(`projectActivities.${i}.actionImpact`, {
+                required: true,
               })}
               placeholder="Impact"
-              className="Input"
               disabled={isDisabled}
             />
             <Input
-              {...register(`projectActivities.${index}.programAttendance`, {
-                required: "Required",
+              {...register(`projectActivities.${i}.programAttendance`, {
+                required: true,
               })}
               placeholder="Attendance"
-              className="Input"
               disabled={isDisabled}
             />
             <Input
-              {...register(`projectActivities.${index}.observations`, {
-                required: "Required",
+              {...register(`projectActivities.${i}.observations`, {
+                required: true,
               })}
               placeholder="Observations"
-              className="Input"
               disabled={isDisabled}
             />
+            {/* add other activity inputs here */}
             {!isDisabled && (
               <Button
                 type="button"
-                className=" bg-zinc-900 text-white"
-                onClick={() => removeActivity(index)}
+                variant={"outline"}
+                onClick={() => removeActivity(i)}
               >
-                Remove Activity
+                Remove
               </Button>
             )}
           </div>
         ))}
         {!isDisabled && (
-          <button
+          <Button
             type="button"
+            variant={"outline"}
             onClick={() =>
               appendActivity({
                 name: "",
@@ -296,86 +203,69 @@ const ProjectForm = ({
                 observations: "",
               })
             }
-            className="btn"
           >
-            + Add Activity
-          </button>
+            + Add
+          </Button>
         )}
       </div>
 
-      {/* Project Range Coverage */}
-      <div className="space-y-2">
-        <h3 className="text-xl font-medium">Range Coverage</h3>
-        <Input
-          type="number"
-          {...register("projectRangeCoverage.numberOfVillages", {
-            required: "Required",
-          })}
-          placeholder="Number of Villages"
-          className="Input"
-          disabled={isDisabled}
-        />
-        <Input
-          type="number"
-          {...register("projectRangeCoverage.totalPopulation", {
-            required: "Required",
-          })}
-          placeholder="Total Population"
-          className="Input"
-          disabled={isDisabled}
-        />
-        <Input
-          type="number"
-          {...register("projectRangeCoverage.numberOfFarmers", {
-            required: "Required",
-          })}
-          placeholder="Number of Farmers"
-          className="Input"
-          disabled={isDisabled}
-        />
-      </div>
+      {/* Range Coverage */}
+      <Input
+        type="number"
+        {...register("projectRangeCoverage.numberOfVillages", {
+          required: true,
+        })}
+        placeholder="Villages"
+        disabled={isDisabled}
+      />
+      <Input
+        type="number"
+        {...register("projectRangeCoverage.totalPopulation", {
+          required: true,
+        })}
+        placeholder="Population"
+        disabled={isDisabled}
+      />
+      <Input
+        type="number"
+        {...register("projectRangeCoverage.numberOfFarmers", {
+          required: true,
+        })}
+        placeholder="Farmers"
+        disabled={isDisabled}
+      />
 
-      {/* Support & Pending Work */}
+      {/* Support & Pending */}
       <Textarea
-        {...register("requiredSupportFromHO", { required: "Required" })}
+        {...register("requiredSupportFromHO", { required: true })}
         placeholder="Support from HO"
-        className="Input"
         disabled={isDisabled}
       />
       <Textarea
-        {...register("pendingWorks", { required: "Required" })}
+        {...register("pendingWorks", { required: true })}
         placeholder="Pending Works"
-        className="Input"
         disabled={isDisabled}
       />
 
-      {/* Final Buttons */}
-      {!isDisabled && (
-        <div className="flex w-full items-center justify-between px-4">
-          <div></div>
-          <div className="flex items-center justify-center gap-4">
-            {projectId && (
-              <Button
-                type="button"
-                onClick={() => deleteProjectHandler(projectId)}
-                variant={"outline"}
-                className="bg-zinc-900 text-white block btn btn-primary"
-              >
-                Delete
-              </Button>
-            )}
-            <Button
-              type="submit"
-              variant={"outline"}
-              className="bg-zinc-900 text-white block btn btn-primary"
-            >
-              Submit Project
-            </Button>
-          </div>
-        </div>
-      )}
+      {/* Actions */}
+      <div className="flex justify-end gap-4">
+        {projectId && !isDisabled && (
+          <Button
+            type="button"
+            variant="outline"
+            onClick={deleteProjectHandler}
+          >
+            Delete
+          </Button>
+        )}
+        {!isDisabled && (
+          <Button variant={"outline"} type="submit">
+            {projectId ? "Update" : "Create"}
+          </Button>
+        )}
+      </div>
     </form>
   );
 };
 
-export default ProjectForm;
+export default React.memo(ProjectForm);

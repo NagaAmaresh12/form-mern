@@ -1,3 +1,4 @@
+// src/features/projects/Project.jsx
 import { createProject } from "@/features/projects/projectThunk";
 import React from "react";
 import { useForm, useFieldArray } from "react-hook-form";
@@ -6,19 +7,20 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import ProjectForm from "../components/ProjectForm.jsx";
 import ReactConfetti from "react-confetti";
-import { useWindowSize } from "react-use"; // for screen width/height
+import { useWindowSize } from "react-use";
 
 const Project = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [showConfetti, setShowConfetti] = React.useState(false);
-  const { width, height } = useWindowSize(); // auto track window size
+  const { width, height } = useWindowSize();
 
+  // initialize form for creation
   const {
     register,
     control,
-    reset,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm({
     defaultValues: {
@@ -52,37 +54,31 @@ const Project = () => {
     },
   });
 
-  const { fields: teamFields, append: appendTeam } = useFieldArray({
-    control,
-    name: "projectTeamDetails",
-  });
-
-  const { fields: activityFields, append: appendActivity } = useFieldArray({
-    control,
-    name: "projectActivities",
-  });
+  const {
+    fields: teamFields,
+    append: appendTeam,
+    remove: removeTeam,
+  } = useFieldArray({ control, name: "projectTeamDetails" });
+  const {
+    fields: activityFields,
+    append: appendActivity,
+    remove: removeActivity,
+  } = useFieldArray({ control, name: "projectActivities" });
 
   const onSubmit = async (formData) => {
-    console.log("form data from project.jsx", formData);
-
     try {
       const resultAction = await dispatch(createProject(formData)).unwrap();
-      console.log("resultAction", resultAction);
-
-      const createdId = resultAction?.data?._id;
-
-      if (resultAction.success === true) {
+      if (resultAction.success) {
+        const createdId = resultAction.data._id;
         reset();
         setShowConfetti(true);
-
-        // Let confetti play for 3 seconds
         setTimeout(() => {
           setShowConfetti(false);
           navigate(`/projects/${createdId}`);
         }, 3000);
       }
-    } catch (error) {
-      toast.error(error.message || "Failed to create project");
+    } catch (err) {
+      toast.error(err.message || "Failed to create project");
     }
   };
 
@@ -94,19 +90,19 @@ const Project = () => {
           height={height}
           numberOfPieces={400}
           recycle={false}
-          style={{ zIndex: 9999, pointerEvents: "none" }}
         />
       )}
-
       <ProjectForm
-        onSubmit={onSubmit}
+        onSubmit={handleSubmit(onSubmit)}
         register={register}
         control={control}
         errors={errors}
         teamFields={teamFields}
-        activityFields={activityFields}
         appendTeam={appendTeam}
+        removeTeam={removeTeam}
+        activityFields={activityFields}
         appendActivity={appendActivity}
+        removeActivity={removeActivity}
       />
     </>
   );
