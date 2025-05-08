@@ -10,6 +10,7 @@ import {
 import { useForm, useFieldArray } from "react-hook-form";
 import { toast } from "react-toastify";
 import ProjectForm from "./ProjectForm.jsx";
+import { ClipLoader } from "react-spinners";
 
 const ProjectDetails = () => {
   const { id } = useParams();
@@ -82,7 +83,14 @@ const ProjectDetails = () => {
     }
   }, [dispatch, id, navigate]);
 
-  if (loading) return <div>Loading...</div>;
+  if (loading)
+    return (
+      <ClipLoader
+        size={50} // default: 35
+        color={"#123abc"} // default: #000
+        loading={true} // boolean to toggle visibility
+      />
+    );
   if (!projects) return <div>Project not found.</div>;
 
   return (
