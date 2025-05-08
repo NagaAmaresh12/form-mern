@@ -14,6 +14,7 @@ import { toast } from "react-toastify";
 const ProjectsList = () => {
   const dispatch = useDispatch();
   const { projects, status, error } = useSelector((state) => state.projects);
+  const { user } = useSelector((state) => state.auth); // <-- Get user from auth
 
   useEffect(() => {
     dispatch(fetchAllProjects())
@@ -40,9 +41,19 @@ const ProjectsList = () => {
   }
 
   return (
-    <div className="w-full relative flex justify-center py-5 mt-4">
+    <div className="w-full relative flex flex-col items-center py-5 mt-4 gap-4">
+      {/* Create button only visible if user is admin */}
+      {user?.role === "admin" && (
+        <Link to="/projects/new">
+          <Button className="bg-zinc-900 text-white absolute right-7 top-0">
+            {" "}
+            Create Project
+          </Button>
+        </Link>
+      )}
+
       <DropdownMenu>
-        <div className="w-[80vw] relative">
+        <div className="w-[80vw] relative mt-5">
           <DropdownMenuTrigger asChild>
             <Button className="w-full justify-between border border-zinc-900 bg-white py-6">
               Projects
@@ -61,7 +72,7 @@ const ProjectsList = () => {
                   className={"hover:cursor-pointer bg-white"}
                 >
                   <Link
-                    className=" hover:bg-zinc-200 my-2"
+                    className="hover:bg-zinc-200 my-2"
                     to={`/projects/${project._id}`}
                   >
                     {project.projectTitle}
