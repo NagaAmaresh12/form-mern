@@ -1,33 +1,44 @@
-// src/App.js
-import React, { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { checkAuth } from "./features/auth/authThunks";
-import { useNavigate } from "react-router-dom";
+// src/App.jsx
+import { Routes, Route, Navigate } from "react-router-dom";
+import AuthHandler from "./components/AuthHandler.jsx";
+import Auth from "./pages/Auth.jsx";
+import Profile from "./pages/Profile.jsx";
+import NotFound from "./pages/NotFound.jsx";
+import VerifyEmail from "./components/VerifyEmail.jsx";
+import ProjectsList from "./components/ProjectsList.jsx";
+import Project from "./components/Project.jsx";
+import ProjectDetails from "./components/ProjectDetails.jsx";
+import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import Layout from "./layouts/Layout.jsx";
 
 const App = () => {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const { isAuthenticated, status } = useSelector((state) => state.auth);
+  return (
+    <>
+      <AuthHandler />
 
-  useEffect(() => {
-    if (!isAuthenticated) {
-      console.log("isAuthenticated app.jsx", isAuthenticated);
+      <Routes>
+        <Route path="/auth" element={<Auth />} />
+        <Route path="/verify-email" element={<VerifyEmail />} />
 
-      dispatch(checkAuth());
-    } else {
-      navigate("/profile");
-    }
-  }, [dispatch, isAuthenticated, navigate]);
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <Layout />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<Navigate to="/profile" replace />} />
+          <Route path="profile" element={<Profile />} />
+          <Route path="projects" element={<ProjectsList />} />
+          <Route path="projects/new" element={<Project />} />
+          <Route path="projects/:id" element={<ProjectDetails />} />
+        </Route>
 
-  if (status === "loading") {
-    return (
-      <div className="absolute left-1/2 top-1/2 -translate-x-1.2 -translate-y-1/2">
-        Loading...
-      </div>
-    );
-  }
-
-  return <div>{isAuthenticated ? "Welcome back!" : "Please log in"}</div>;
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </>
+  );
 };
 
 export default App;

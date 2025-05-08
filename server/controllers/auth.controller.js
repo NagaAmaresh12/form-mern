@@ -45,6 +45,7 @@ export const signUpUser = async (req, res) => {
           username: user.username,
           email: user.email,
           role: user.role,
+          avatarSeed: user.avatar,
         },
       });
   } catch (error) {
@@ -97,6 +98,7 @@ export const signInUser = async (req, res) => {
           username: user.username,
           email: user.email,
           role: user.role,
+          avatarSeed: user.avatar,
         },
       });
   } catch (error) {
@@ -185,12 +187,22 @@ export const protectedRoute = async (req, res) => {
 export const Profile = async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select(
-      "-password -refreshToken"
+      "-password -refreshToken -emailVerified -emailVerificationToken"
     );
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-    res.status(200).json({ user });
+    console.log("user profile", user);
+
+    res.status(200).json({
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+        avatarSeed: user.avatar,
+      },
+    });
   } catch (error) {
     console.error("Profile error:", error);
     res.status(500).json({ message: "Server error" });
@@ -198,7 +210,12 @@ export const Profile = async (req, res) => {
 };
 export const avatarSeed = async (req, res) => {
   try {
-    const { avatarSeed } = req.body;
+    const { avatar } = req.body;
+    const { avatarSeed } = avatar;
+    console.log(avatarSeed);
+
+    console.log("avatarseed", avatarSeed);
+
     const userId = req.user.id;
 
     if (!avatarSeed) {
@@ -216,12 +233,12 @@ export const avatarSeed = async (req, res) => {
       });
     }
 
-    user.avatarSeed = avatarSeed; // assuming schema has avatarSeed field
+    user.avatar = avatarSeed; // assuming schema has avatarSeed field
     await user.save();
 
     return res.status(200).json({
       message: "Avatar updated successfully",
-      avatarSeed: user.avatarSeed,
+      avatarSeed: user.avatar,
       success: true,
     });
   } catch (error) {

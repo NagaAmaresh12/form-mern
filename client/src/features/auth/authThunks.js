@@ -77,7 +77,9 @@ export const updateAvatarSeed = createAsyncThunk(
   "auth/updateAvatarSeed", // ✅ corrected spelling
   async (avatarSeed, thunkAPI) => {
     try {
-      const { data } = await axios.patch("/auth/avatarSeed", { avatarSeed });
+      const { data } = await axios.patch("/auth/avatarSeed", {
+        avatar: avatarSeed,
+      });
       console.log("data", data);
 
       return data; // e.g. { avatarSeed: "new-seed" }

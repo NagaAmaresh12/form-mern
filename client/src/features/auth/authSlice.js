@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import {
+  signUpUser,
   signInUser,
   checkAuth,
   logoutUser,
@@ -16,7 +17,7 @@ const initialState = {
   },
   status: "idle",
   isAuthenticated: false,
-  loading: false,
+  loading: true,
   error: null,
 };
 
@@ -33,13 +34,53 @@ const authSlice = createSlice({
         state.error = null;
       })
       .addCase(signInUser.fulfilled, (state, action) => {
+        console.log("signinuser payload", action.payload);
+        const { id, username, email, role, avatarSeed } = action.payload.user;
+
+        state.user = {
+          _id: id,
+          username,
+          email,
+          role,
+          avatarSeed: avatarSeed,
+        };
         state.loading = false;
         state.status = "succeeded";
-        state.user = action.payload.user;
+        // state.user = action.payload.user;
         state.isAuthenticated = true;
         state.error = null;
       })
       .addCase(signInUser.rejected, (state, action) => {
+        state.loading = false;
+        state.status = "failed";
+        state.isAuthenticated = false;
+        state.user = { ...initialState.user };
+        state.error = action.payload || action.error.message;
+      })
+      //handle signUp
+      .addCase(signUpUser.pending, (state) => {
+        state.status = "loading";
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(signUpUser.fulfilled, (state, action) => {
+        console.log("signUpUser payload", action.payload);
+        const { id, username, email, role, avatarSeed } = action.payload.user;
+
+        state.user = {
+          _id: id,
+          username,
+          email,
+          role,
+          avatarSeed: avatarSeed,
+        };
+        state.loading = false;
+        state.status = "succeeded";
+        // state.user = action.payload.user;
+        state.isAuthenticated = true;
+        state.error = null;
+      })
+      .addCase(signUpUser.rejected, (state, action) => {
         state.loading = false;
         state.status = "failed";
         state.isAuthenticated = false;
@@ -54,9 +95,18 @@ const authSlice = createSlice({
         state.error = null;
       })
       .addCase(checkAuth.fulfilled, (state, action) => {
+        console.log("check auth payload", action.payload.user);
+        const { id, username, email, role, avatarSeed } = action.payload.user;
+
+        state.user = {
+          _id: id,
+          username,
+          email,
+          role,
+          avatarSeed: avatarSeed,
+        };
         state.loading = false;
         state.status = "succeeded";
-        state.user = action.payload.user;
         state.isAuthenticated = true;
         state.error = null;
       })
@@ -88,14 +138,16 @@ const authSlice = createSlice({
       })
       // Handle avatar seed update
       .addCase(updateAvatarSeed.pending, (state) => {
-        state.status = "updating_avatar";
+        state.status = "loading";
         state.loading = true;
         state.error = null;
       })
       .addCase(updateAvatarSeed.fulfilled, (state, action) => {
+        console.log("avatar from slice", action.payload.avatarSeed);
+
         state.loading = false;
-        state.status = "avatar_updated";
-        state.user.avatarSeed = action.payload.avatarSeed.avatarSeed;
+        state.status = "succeeded";
+        state.user.avatarSeed = action.payload.avatarSeed;
         state.error = null;
       })
       .addCase(updateAvatarSeed.rejected, (state, action) => {

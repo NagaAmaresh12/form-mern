@@ -18,7 +18,7 @@ const Layout = () => {
         </div>
 
         {/* Main content on right */}
-        <main className="relative h-full w-full bg-[#EFEFEF] relative">
+        <main className="relative min-h-[84.8vh] w-full bg-[#EFEFEF] relative">
           <Outlet />
         </main>
       </div>

@@ -19,7 +19,7 @@ axiosInstance.interceptors.response.use(
       originalRequest._retry = true;
       try {
         // Attempt to refresh the access token
-        await axiosInstance.get("/api/users/refresh-token");
+        await axiosInstance.get("/users/refresh-token");
 
         // Retry the original request
         return axiosInstance(originalRequest);
