@@ -86,6 +86,7 @@ const ProjectDetails = () => {
   if (loading)
     return (
       <ClipLoader
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
         size={50} // default: 35
         color={"#123abc"} // default: #000
         loading={true} // boolean to toggle visibility
