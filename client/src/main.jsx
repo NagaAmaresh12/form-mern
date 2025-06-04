@@ -5,7 +5,7 @@ import { Provider } from "react-redux";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-import { store } from "./store/store.js";
+import { store } from "./redux/store/store.js";
 import App from "./App.jsx";
 import ConfettiWrapper from "./components/ConfettiWrapper.jsx";
 

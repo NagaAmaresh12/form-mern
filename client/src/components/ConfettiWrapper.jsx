@@ -1,6 +1,6 @@
 import ReactConfetti from "react-confetti";
 import { useSelector, useDispatch } from "react-redux";
-import { stopConfetti } from "@/features/confettiSlice.js";
+import { stopConfetti } from "@/redux/slices/confettiSlice.js";
 import React from "react";
 
 const ConfettiWrapper = () => {

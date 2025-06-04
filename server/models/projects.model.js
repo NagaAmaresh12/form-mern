@@ -1,7 +1,13 @@
 import mongoose from "mongoose";
+const expenditureSchema = new mongoose.Schema({
+  description: { type: String, required: true },
+  amount: { type: Number, required: true },
+  date: { type: Date, required: true },
+});
 
 const activitySchema = new mongoose.Schema({
   name: { type: String, required: true },
+  date: { type: Date, required: true },
   daywiseWorkProgress: { type: String, required: true },
   placeOfVisit: { type: String, required: true },
   actionTaken: { type: String, required: true },
@@ -19,7 +25,8 @@ const projectReportSchema = new mongoose.Schema({
 
   projectTeamDetails: [
     {
-      name: { type: String, required: true },
+      firstName: { type: String, required: true },
+      lastName: { type: String, required: true },
       contactNumber: { type: String, required: true },
       headQtrs: { type: String, required: true },
     },
@@ -28,8 +35,10 @@ const projectReportSchema = new mongoose.Schema({
   projectObjectives: { type: String, required: true },
   projectDuration: { type: String, required: true },
   projectCommencementDate: { type: Date, required: true },
-
+  projectStartDate: { type: Date, required: true },
+  projectEndDate: { type: Date, required: true },
   projectActivities: { type: [activitySchema], required: true },
+  projectExpenditure: { type: [expenditureSchema], required: false },
 
   projectRangeCoverage: {
     numberOfVillages: { type: Number, required: true },

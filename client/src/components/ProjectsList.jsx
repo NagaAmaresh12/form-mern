@@ -1,20 +1,28 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchAllProjects } from "@/features/projects/projectThunk";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
+import { fetchAllProjects } from "@/redux/thunks/projectThunk";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
+import { Input } from "@/components/ui/input";
+import ProjectCard from "./ProjectCard";
+import { LiaGhostSolid } from "react-icons/lia";
 
 const ProjectsList = () => {
   const dispatch = useDispatch();
-  const { projects, status, error } = useSelector((state) => state.projects);
-  const { user } = useSelector((state) => state.auth); // <-- Get user from auth
+
+  const [search, setSearch] = useState("");
+  const [filterBy, setFilterBy] = useState("projectTitle");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+
+  const {
+    projects: rawProjects,
+    status,
+    error,
+  } = useSelector((state) => state.projects);
+
+  const { user } = useSelector((state) => state.auth);
 
   useEffect(() => {
     dispatch(fetchAllProjects())
@@ -27,6 +35,42 @@ const ProjectsList = () => {
         toast.error("Error fetching projects");
       });
   }, [dispatch]);
+
+  const projects = Array.isArray(rawProjects) ? rawProjects : [];
+
+  // Helper: Check if a given date string is within start/end range
+  const isWithinRange = (dateStr) => {
+    if (!startDate || !endDate) return true;
+    const date = new Date(dateStr);
+    return date >= new Date(startDate) && date <= new Date(endDate);
+  };
+
+  // Apply both text filter and date range filter
+  const filteredProjects = projects
+    .filter((project) => {
+      const query = search.toLowerCase();
+      switch (filterBy) {
+        case "projectTitle":
+          return project.projectTitle?.toLowerCase().includes(query);
+        case "activityName":
+          return project.projectActivities?.some((activity) =>
+            activity.name?.toLowerCase().includes(query)
+          );
+        case "teamMember":
+          return project.projectTeamDetails?.some((member) =>
+            `${member.firstName} ${member.lastName}`
+              ?.toLowerCase()
+              .includes(query)
+          );
+        case "date":
+          return project.projectActivities?.some((activity) =>
+            activity.date?.toLowerCase().includes(query)
+          );
+        default:
+          return true;
+      }
+    })
+    .filter((project) => isWithinRange(project.projectCommencementDate));
 
   if (status === "loading") {
     return (
@@ -41,52 +85,72 @@ const ProjectsList = () => {
   }
 
   return (
-    <div className="w-full relative flex flex-col items-center py-5 mt-4 gap-4">
-      {/* Create button only visible if user is admin */}
-      {user?.role === "admin" && (
-        <Link to="/projects/new">
-          <Button className="bg-zinc-900 text-white absolute right-7 top-0">
-            {" "}
-            Create Project
-          </Button>
-        </Link>
-      )}
+    <div>
+      <div className="w-full h-full flex flex-col items-center py-5 mt-3 gap-4">
+        {/* Filters */}
+        <div className="w-full flex items-center justify-between px-14 gap-2">
+          <div className="w-full flex gap-4">
+            <select
+              className="border border-gray-300 rounded px-4 py-2"
+              onChange={(e) => setFilterBy(e.target.value)}
+              value={filterBy}
+            >
+              <option value="projectTitle">By Project</option>
+              <option value="activityName">By Activity Name</option>
+              <option value="teamMember">By Team Member</option>
+              <option value="date">By Date</option>
+            </select>
 
-      <DropdownMenu>
-        <div className="w-[80vw] relative mt-5">
-          <DropdownMenuTrigger asChild>
-            <Button className="w-full justify-between border border-zinc-900 bg-white py-6">
-              Projects
-            </Button>
-          </DropdownMenuTrigger>
+            <Input
+              placeholder={`Search by ${filterBy}`}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-[40%] bg-zinc-200"
+            />
 
-          <DropdownMenuContent
-            className="bg-white mt-1 w-[80vw] flex flex-col justify-center"
-            align="start"
-          >
-            {Array.isArray(projects) && projects.length > 0 ? (
-              projects.map((project) => (
-                <DropdownMenuItem
-                  asChild
-                  key={project._id}
-                  className={"hover:cursor-pointer bg-white"}
-                >
-                  <Link
-                    className="hover:bg-zinc-200 my-2"
-                    to={`/projects/${project._id}`}
-                  >
-                    {project.projectTitle}
-                  </Link>
-                </DropdownMenuItem>
-              ))
-            ) : (
-              <DropdownMenuItem disabled>
-                No projects available
-              </DropdownMenuItem>
-            )}
-          </DropdownMenuContent>
+            <Input
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+            />
+
+            <Input
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+            />
+          </div>
+
+          {/* Admin-only Create Button */}
+          {user?.role === "admin" && (
+            <Link to="/projects/new">
+              <Button className="bg-zinc-900 text-white">Create Project</Button>
+            </Link>
+          )}
         </div>
-      </DropdownMenu>
+      </div>
+
+      {/* Project List */}
+      <div className="flex flex-col items-center mt-6 h-full w-full">
+        {filteredProjects.length > 0 ? (
+          filteredProjects.map((project) => (
+            <ProjectCard
+              totalBudget={project.totalBudget}
+              spentBudget={project.spentBudget}
+              key={project._id}
+              id={project._id}
+              projectTitle={project.projectTitle}
+            />
+          ))
+        ) : (
+          <div className="text-sky-400 mt-10">
+            <div className="flex flex-col items-center ">
+              <LiaGhostSolid className="h-[10vw] w-[10vw]" />
+              <h6>No projects available</h6>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

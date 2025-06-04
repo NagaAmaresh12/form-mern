@@ -4,6 +4,8 @@ import { Input } from "./ui/input";
 import { Select } from "./ui/select";
 
 const HandleForm = ({ formData, register }) => {
+  console.log("formData", formData);
+
   const selectElements = () => {
     return formData.map((item, index) => {
       switch (item.componentType) {

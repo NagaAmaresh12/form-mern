@@ -1,5 +1,5 @@
 // src/features/projects/Project.jsx
-import { createProject } from "@/features/projects/projectThunk";
+import { createProject } from "@/redux/thunks/projectThunk.js";
 import React from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { useDispatch } from "react-redux";
@@ -19,6 +19,7 @@ const Project = () => {
   const {
     register,
     control,
+    watch,
     handleSubmit,
     reset,
     formState: { errors },
@@ -32,17 +33,26 @@ const Project = () => {
       projectObjectives: "",
       projectDuration: "",
       projectCommencementDate: "",
+      projectStartDate: "", // Use projectCommencementDate or rename for clarity
+      projectEndDate: "",
+      projectExpenditure: [{ description: "", amount: "", date: "" }],
+
       projectRangeCoverage: {
         numberOfVillages: "",
         totalPopulation: "",
         numberOfFarmers: "",
       },
+
       requiredSupportFromHO: "",
       pendingWorks: "",
-      projectTeamDetails: [{ name: "", contactNumber: "", headQtrs: "" }],
+      projectTeamDetails: [
+        { firstName: "", lastName: "", contactNumber: "", headQtrs: "" },
+      ],
+
       projectActivities: [
         {
           name: "",
+          date: "",
           daywiseWorkProgress: "",
           placeOfVisit: "",
           actionTaken: "",
@@ -64,6 +74,11 @@ const Project = () => {
     append: appendActivity,
     remove: removeActivity,
   } = useFieldArray({ control, name: "projectActivities" });
+  const {
+    fields: expenditureFields,
+    append: appendExpenditure,
+    remove: removeExpenditure,
+  } = useFieldArray({ control, name: "projectExpenditure" });
 
   const onSubmit = async (formData) => {
     try {
@@ -103,6 +118,10 @@ const Project = () => {
         activityFields={activityFields}
         appendActivity={appendActivity}
         removeActivity={removeActivity}
+        expenditureFields={expenditureFields}
+        appendExpenditure={appendExpenditure} // ✅ Corrected
+        removeExpenditure={removeExpenditure}
+        watch={watch}
       />
     </>
   );

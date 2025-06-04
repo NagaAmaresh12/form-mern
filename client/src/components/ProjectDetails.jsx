@@ -6,7 +6,7 @@ import {
   fetchProject,
   editProject,
   deleteProject,
-} from "@/features/projects/projectThunk";
+} from "@/redux/thunks/projectThunk.js";
 import { useForm, useFieldArray } from "react-hook-form";
 import { toast } from "react-toastify";
 import ProjectForm from "./ProjectForm.jsx";
@@ -45,14 +45,26 @@ const ProjectDetails = () => {
     dispatch(fetchProject(id))
       .unwrap()
       .then((res) => {
-        // make a mutable clone of the fetched data
         const data = JSON.parse(JSON.stringify(res.data));
-        // normalize date
+
+        // Normalize projectCommencementDate to YYYY-MM-DD string
         if (data.projectCommencementDate) {
           data.projectCommencementDate = new Date(data.projectCommencementDate)
             .toISOString()
             .split("T")[0];
         }
+
+        // Normalize all activity dates similarly
+        if (Array.isArray(data.projectActivities)) {
+          data.projectActivities.forEach((activity, idx) => {
+            if (activity.date) {
+              data.projectActivities[idx].date = new Date(activity.date)
+                .toISOString()
+                .split("T")[0];
+            }
+          });
+        }
+
         reset(data);
       })
       .catch((err) => toast.error(err.message || "Failed to fetch project"))

@@ -24,6 +24,8 @@ export const signInUser = createAsyncThunk(
 export const signUpUser = createAsyncThunk(
   "auth/signUpUser",
   async (newUser, thunkAPI) => {
+    console.log("newUser in thunk", newUser);
+
     try {
       const { data } = await axios.post("/auth/signUp", newUser, {
         withCredentials: true,

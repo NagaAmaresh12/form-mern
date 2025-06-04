@@ -5,20 +5,21 @@ import SideBar from "../components/SideBar.jsx";
 
 const Layout = () => {
   return (
-    <div className="relative min-h-screen">
-      {/* Navbar spans full width of top row */}
-      <div className="w-full h-24 ">
+    <div className="h-screen w-screen overflow-hidden">
+      {/* Navbar */}
+      <header className="fixed top-0 left-0 right-0 h-16 bg-white shadow z-50">
         <Navbar />
-      </div>
+      </header>
 
-      <div className="relative flex items-start h-[84vh] w-full">
-        {/* Sidebar on left */}
-        <div className=" border-r pt-8 h-full w-64 text-white px-4 ">
+      {/* Sidebar and Main Content */}
+      <div className="flex pt-16 h-full">
+        {/* Sidebar */}
+        <aside className="fixed left-0 top-16 bottom-0 w-60 bg-gray-100 border-r z-40 mt-5 py-10 text-white">
           <SideBar />
-        </div>
+        </aside>
 
-        {/* Main content on right */}
-        <main className="relative min-h-[84.8vh] w-full bg-[#EFEFEF] relative">
+        {/* Main Scrollable Content */}
+        <main className="ml-60 mt-0 w-[calc(100%-15rem)] h-[calc(100vh-4rem)] overflow-y-auto overflow-x-hidden p-6">
           <Outlet />
         </main>
       </div>

@@ -1,9 +1,9 @@
 // src/store/store.js
 import { configureStore } from "@reduxjs/toolkit";
 
-import authReducer from "@/features/auth/authSlice.js";
-import projectsReducer from "@/features/projects/projectSlice.js";
-import confettiSlice from "@/features/confettiSlice.js";
+import authReducer from "@/redux/slices/authSlice.js";
+import projectsReducer from "@/redux/slices/projectSlice.js";
+import confettiSlice from "@/redux/slices/confettiSlice.js";
 
 export const store = configureStore({
   reducer: {

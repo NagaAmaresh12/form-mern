@@ -5,12 +5,13 @@ import {
   checkAuth,
   logoutUser,
   updateAvatarSeed,
-} from "./authThunks.js";
+} from "../thunks/authThunks.js";
 
 const initialState = {
   user: {
     id: null,
-    username: null,
+    firstName: null,
+    lastName: null,
     email: null,
     role: null,
     avatarSeed: "",
@@ -35,11 +36,13 @@ const authSlice = createSlice({
       })
       .addCase(signInUser.fulfilled, (state, action) => {
         console.log("signinuser payload", action.payload);
-        const { id, username, email, role, avatarSeed } = action.payload.user;
+        const { id, firstName, lastName, email, role, avatarSeed } =
+          action.payload.user;
 
         state.user = {
           _id: id,
-          username,
+          firstName,
+          lastName,
           email,
           role,
           avatarSeed: avatarSeed,
@@ -65,11 +68,13 @@ const authSlice = createSlice({
       })
       .addCase(signUpUser.fulfilled, (state, action) => {
         console.log("signUpUser payload", action.payload);
-        const { id, username, email, role, avatarSeed } = action.payload.user;
+        const { id, firstName, lastName, email, role, avatarSeed } =
+          action.payload.user;
 
         state.user = {
           _id: id,
-          username,
+          firstName,
+          lastName,
           email,
           role,
           avatarSeed: avatarSeed,
@@ -96,11 +101,13 @@ const authSlice = createSlice({
       })
       .addCase(checkAuth.fulfilled, (state, action) => {
         console.log("check auth payload", action.payload.user);
-        const { id, username, email, role, avatarSeed } = action.payload.user;
+        const { id, firstName, lastName, email, role, avatarSeed } =
+          action.payload.user;
 
         state.user = {
           _id: id,
-          username,
+          firstName,
+          lastName,
           email,
           role,
           avatarSeed: avatarSeed,

@@ -1,8 +1,16 @@
 export const signUpFormData = [
   {
     componentType: "input",
-    label: "User Name",
-    name: "username",
+    label: "First Name",
+    name: "firstName",
+    type: "text",
+    required: true,
+    placeholder: "Enter your name",
+  },
+  {
+    componentType: "input",
+    label: "Last Name",
+    name: "lastName",
     type: "text",
     required: true,
     placeholder: "Enter your name",

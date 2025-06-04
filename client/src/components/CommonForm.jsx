@@ -1,13 +1,13 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { signInUser, signUpUser } from "../features/auth/authThunks.js";
+import { signInUser, signUpUser } from "../redux/thunks/authThunks.js";
 import { useForm } from "react-hook-form";
 import { Button } from "./ui/button.jsx";
 import HandleForm from "./HandleForm.jsx";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 // import { handleFormSubmit } from "../utils/handleFormSubmit.js";
-import { triggerConfetti } from "@/features/confettiSlice.js";
+import { triggerConfetti } from "@/redux/slices/confettiSlice.js";
 
 // After successful signup or project creation
 
@@ -16,7 +16,7 @@ const CommonForm = ({ formData, buttonText = "Submit" }) => {
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors, isSubmitting, isValid },
   } = useForm();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -28,7 +28,7 @@ const CommonForm = ({ formData, buttonText = "Submit" }) => {
     let auth;
     try {
       let response;
-      if (data.username) {
+      if (data.firstName || data.lastName) {
         auth = "signup";
         response = await dispatch(signUpUser(data)).unwrap();
         toast.success("User registered successfully!");
@@ -67,7 +67,7 @@ const CommonForm = ({ formData, buttonText = "Submit" }) => {
         type="submit"
         variant="outline"
         className="bg-zinc-900 text-white text-lg w-full p-5"
-        disabled={isSubmitting}
+        disabled={isSubmitting || !isValid}
       >
         {isSubmitting ? "Submitting..." : buttonText}
       </Button>

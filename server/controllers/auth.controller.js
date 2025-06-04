@@ -1,7 +1,8 @@
 import { User } from "../models/users.model.js";
 
 export const signUpUser = async (req, res) => {
-  const { username, email, password } = req.body;
+  const { firstName, lastName, email, password } = req.body;
+  console.log("SignUp request body:", req.body);
 
   try {
     const existingUser = await User.findOne({ email });
@@ -11,7 +12,7 @@ export const signUpUser = async (req, res) => {
         .json({ success: false, message: "User already exists" });
     }
 
-    const user = new User({ username, email });
+    const user = new User({ firstName, lastName, email });
     user.password = await user.hashPassword(password);
 
     const accessToken = user.generateAccessToken();
@@ -42,7 +43,8 @@ export const signUpUser = async (req, res) => {
         message: "User SignUp successfull",
         user: {
           id: user._id,
-          username: user.username,
+          firstName: user.firstName,
+          lastName: user.lastName,
           email: user.email,
           role: user.role,
           avatarSeed: user.avatar,
@@ -95,7 +97,8 @@ export const signInUser = async (req, res) => {
         success: true,
         user: {
           id: user._id,
-          username: user.username,
+          firstName: user.firstName,
+          lastName: user.lastName,
           email: user.email,
           role: user.role,
           avatarSeed: user.avatar,
@@ -197,7 +200,8 @@ export const Profile = async (req, res) => {
     res.status(200).json({
       user: {
         id: user._id,
-        username: user.username,
+        firstName: user.firstName,
+        lastName: user.lastName,
         email: user.email,
         role: user.role,
         avatarSeed: user.avatar,

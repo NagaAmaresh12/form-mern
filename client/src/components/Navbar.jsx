@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { logoutUser } from "@/features/auth/authThunks";
+import { logoutUser } from "@/redux/thunks/authThunks";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { createAvatar } from "@dicebear/core";

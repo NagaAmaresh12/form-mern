@@ -7,6 +7,8 @@ export const fetchAllProjects = createAsyncThunk(
   async (_, thunkAPI) => {
     try {
       const { data } = await axios.get("/projects");
+      console.log("fetchAllProjects data", data);
+
       return data; // adjust based on actual response structure
     } catch (err) {
       const message =

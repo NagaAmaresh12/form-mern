@@ -1,7 +1,7 @@
 // src/components/AuthHandler.jsx
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { checkAuth } from "../features/auth/authThunks";
+import { checkAuth } from "../redux/thunks/authThunks";
 import { useNavigate } from "react-router-dom";
 import { ClipLoader } from "react-spinners";
 
